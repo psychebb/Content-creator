@@ -1,0 +1,7 @@
+{
+  "name": "SocialMuse AI",
+  "description": "An intelligent social media content creator that scans your photos and videos to generate platform-optimized captions, tags, and oral-toned storytelling for Rednote, TikTok, and Instagram.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
