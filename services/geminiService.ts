@@ -1,39 +1,41 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { SocialPlatform, ToneType, GenerationResult } from "../types";
+import { SocialPlatform, ToneType, GenerationResult, Language } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+// Always use const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateSocialContent = async (
-  base64Data: string,
-  mimeType: string,
+  mediaParts: { data: string; mimeType: string }[],
   platform: SocialPlatform,
-  tone: ToneType
+  tone: ToneType,
+  language: Language
 ): Promise<GenerationResult> => {
   const model = "gemini-3-flash-preview";
 
   const prompt = `
-    Analyze this material from a daily life context.
-    1. Identify the main item or subject of the photo/video.
-    2. Write a highly engaging social media caption for ${platform}.
-    3. The tone should be ${tone}.
+    Analyze these ${mediaParts.length} material(s) from a daily life context.
+    1. Identify the core theme or main items across all provided materials.
+    2. Write a highly engaging social media caption for ${platform} in ${language}.
+    3. The tone must be ${tone}.
     4. Follow these guidelines:
        - Default tone is "human oral" - speak like a real person sharing with friends.
+       - Language of output: ${language}.
        - Use platform-specific styles (Rednote: many emojis, helpful tips; TikTok: punchy, hook-first; Instagram: aesthetic, brief).
        - Ensure compliance (safe for all audiences, positive, no offensive content).
-       - Suggest relevant hashtags.
+       - Suggest relevant hashtags in ${language}.
   `;
 
   const response = await ai.models.generateContent({
     model: model,
     contents: {
       parts: [
-        {
+        ...mediaParts.map(m => ({
           inlineData: {
-            data: base64Data,
-            mimeType: mimeType,
+            data: m.data,
+            mimeType: m.mimeType,
           },
-        },
+        })),
         { text: prompt },
       ],
     },
@@ -44,7 +46,7 @@ export const generateSocialContent = async (
         properties: {
           identifiedItem: {
             type: Type.STRING,
-            description: "The main item identified in the photo/video.",
+            description: "The main item or theme identified in the materials.",
           },
           caption: {
             type: Type.STRING,

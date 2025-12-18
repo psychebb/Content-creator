@@ -12,6 +12,13 @@ export enum ToneType {
   EXCITED = 'Excited/Hype'
 }
 
+export enum Language {
+  CHINESE = 'Chinese',
+  ENGLISH = 'English',
+  JAPANESE = 'Japanese',
+  KOREAN = 'Korean'
+}
+
 export interface GenerationResult {
   identifiedItem: string;
   caption: string;
@@ -19,6 +26,7 @@ export interface GenerationResult {
 }
 
 export interface MediaFile {
+  id: string;
   url: string;
   type: 'image' | 'video';
   file: File;
